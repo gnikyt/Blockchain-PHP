@@ -1,0 +1,5 @@
+/composer.lock
+/vendor
+/bin
+/example/*.json
+/build
