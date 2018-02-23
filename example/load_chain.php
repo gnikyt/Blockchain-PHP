@@ -1,14 +1,15 @@
 <?php
-require(__DIR__.'/../vendor/autoload.php');
 
-use OhMyBrew\Blockchain\Blockchain;
+require __DIR__.'/../vendor/autoload.php';
+
 use OhMyBrew\Blockchain\Block;
+use OhMyBrew\Blockchain\Blockchain;
 
 // Color setup
-$RED="\033[0;31m";
-$BLUE="\033[0;34m";
-$YELLOW="\033[1;33m";
-$NC="\033[0m";
+$RED = "\033[0;31m";
+$BLUE = "\033[0;34m";
+$YELLOW = "\033[1;33m";
+$NC = "\033[0m";
 
 // Locate the blockchain data and decode it
 if (!isset($argv[1])) {
@@ -24,7 +25,7 @@ foreach ($bcContents as $key => $blockData) {
     $chain[] = new Block(array_merge(
         $blockData,
         [
-            'previous' => isset($chain[$key - 1]) ? $chain[$key - 1] : null
+            'previous' => isset($chain[$key - 1]) ? $chain[$key - 1] : null,
         ]
     ));
 }
@@ -36,7 +37,7 @@ echo "{$BLUE}Inserted ".count($chain)." blocks{$NC}\n";
 // Verify the chain
 if ($bc->isValidChain()) {
     echo "Chain is: {$BLUE}Valid{$NC}\n";
-    echo "Blockchain hash is ".hash('sha256', json_encode($chain)) . " which matches the file input\n";
+    echo 'Blockchain hash is '.hash('sha256', json_encode($chain))." which matches the file input\n";
 } else {
     echo "Chain is: {$RED}Invalid{$NC}\n";
 }

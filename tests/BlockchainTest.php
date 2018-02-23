@@ -2,7 +2,7 @@
 
 namespace OhMyBrew\Blockchain;
 
-use \ReflectionClass;
+use ReflectionClass;
 
 class BlockchainTest extends \PHPUnit\Framework\TestCase
 {
@@ -64,7 +64,7 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
      * @test
      * @expectedException \Exception
      * @exceptedExceptionMessage Block not valid, cannot add block to chain
-     * 
+     *
      * Should not add block to chain who hasnt been mined or invalid.
      */
     public function shouldNotAddInvalidBlockToChain()
@@ -76,7 +76,7 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @test
-     * 
+     *
      * Should add block if valid block.
      */
     public function shouldAddValidBlockToChain()
@@ -96,7 +96,7 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @test
-     * 
+     *
      * Should validate chain.
      */
     public function shouldValidateChain()
@@ -117,7 +117,7 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
      * @test
      * @expectedException \Exception
      * @expectedExceptionMessage Blockchain is invalid, cannot add block to chain
-     * 
+     *
      * Should invalidate chain (tampering maybe?)
      */
     public function shouldInvalidateChain()
@@ -165,7 +165,7 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @test
-     * 
+     *
      * Should confirm blocks are the same.
      */
     public function shouldConfirmBlocksAreTheSame()
@@ -183,7 +183,7 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @test
-     * 
+     *
      * Input of chain should match output
      */
     public function shouldMatchInputAndOutput()
@@ -193,7 +193,7 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
             $chain[] = new Block(array_merge(
                 $blockData,
                 [
-                    'previous' => isset($chain[$key - 1]) ? $chain[$key - 1] : null
+                    'previous' => isset($chain[$key - 1]) ? $chain[$key - 1] : null,
                 ]
             ));
         }

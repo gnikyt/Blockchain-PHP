@@ -2,10 +2,9 @@
 
 namespace OhMyBrew\Blockchain;
 
-use \Exception;
-use \IteratorAggregate;
-use \ArrayIterator;
-use OhMyBrew\Blockchain\Block;
+use ArrayIterator;
+use Exception;
+use IteratorAggregate;
 
 class Blockchain implements IteratorAggregate
 {
@@ -53,6 +52,7 @@ class Blockchain implements IteratorAggregate
     public function getPreviousBlock(?int $index = null) : ?Block
     {
         $target = is_null($index) ? count($this->getChain()) - 1 : $index - 1;
+
         return $target >= 0 ? $this->getChain()[$target] : null;
     }
 
@@ -128,7 +128,7 @@ class Blockchain implements IteratorAggregate
      *
      * @return Blockchain|Exception
      */
-    public function addBlock(Block $block, ?bool $validateChain = false) : ?Blockchain
+    public function addBlock(Block $block, ?bool $validateChain = false) : ?self
     {
         if (!$this->isValidBlock($block)) {
             throw new Exception('Block not valid, cannot add block to chain');
@@ -139,6 +139,7 @@ class Blockchain implements IteratorAggregate
         }
 
         $this->chain[] = $block;
+
         return $this;
     }
 
@@ -155,8 +156,8 @@ class Blockchain implements IteratorAggregate
     {
         return new $blockClass([
             'difficulty' => $difficulty,
-            'previous' => $this->getPreviousBlock(),
-            'data' => $data
+            'previous'   => $this->getPreviousBlock(),
+            'data'       => $data,
         ]);
     }
 }

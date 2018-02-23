@@ -2,9 +2,9 @@
 
 namespace OhMybrew\Blockchain;
 
-use \JsonSerializable;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use JsonSerializable;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Block implements JsonSerializable
 {
@@ -19,7 +19,7 @@ class Block implements JsonSerializable
      *
      * @return Block
      */
-    public function __construct(?array $state, ?Block $previous = null)
+    public function __construct(?array $state, ?self $previous = null)
     {
         if (!isset(self::$resolver)) {
             self::$resolver = new OptionsResolver();
@@ -38,7 +38,7 @@ class Block implements JsonSerializable
     /**
      * Get the block index.
      *
-     * @return integer
+     * @return int
      */
     public function getIndex() : int
     {
@@ -48,7 +48,7 @@ class Block implements JsonSerializable
     /**
      * Get the nonce result from mining.
      *
-     * @return null|integer
+     * @return null|int
      */
     public function getNonce() : ?int
     {
@@ -58,7 +58,7 @@ class Block implements JsonSerializable
     /**
      * Get the difficulty for the mining.
      *
-     * @return integer
+     * @return int
      */
     public function getDifficulty() : int
     {
@@ -68,7 +68,7 @@ class Block implements JsonSerializable
     /**
      * Get the timestamp of the block creation.
      *
-     * @return integer
+     * @return int
      */
     public function getTimestamp() : int
     {
@@ -106,11 +106,11 @@ class Block implements JsonSerializable
     }
 
     /**
-     * Get the previous block, if available
+     * Get the previous block, if available.
      *
      * @return null|Block
      */
-    public function getPrevious() : ?Block
+    public function getPrevious() : ?self
     {
         return $this->state['previous'];
     }
@@ -147,7 +147,7 @@ class Block implements JsonSerializable
      *
      * @return Block
      */
-    public function mine() : Block
+    public function mine() : self
     {
         $nonce = 0;
         while (!$this->validateNonce($nonce)) {
@@ -161,7 +161,7 @@ class Block implements JsonSerializable
     /**
      * Validates an nonce.
      *
-     * @param null|integer $nonce The new nonce value to test
+     * @param null|int $nonce The new nonce value to test
      *
      * @return bool
      */
@@ -203,13 +203,13 @@ class Block implements JsonSerializable
     protected function jsonSerializeData() : array
     {
         return [
-            'index' => $this->getIndex(),
-            'nonce' => $this->getNonce(),
-            'difficulty' => $this->getDifficulty(),
-            'timestamp' => $this->getTimestamp(),
-            'data' => $this->getData(),
+            'index'         => $this->getIndex(),
+            'nonce'         => $this->getNonce(),
+            'difficulty'    => $this->getDifficulty(),
+            'timestamp'     => $this->getTimestamp(),
+            'data'          => $this->getData(),
             'previous_hash' => $this->getPreviousHash(),
-            'hash' => $this->getHash()
+            'hash'          => $this->getHash(),
         ];
     }
 
@@ -230,6 +230,7 @@ class Block implements JsonSerializable
      * Typing out and remembering a list of arguments for the constructor.
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     public function configureOptions(OptionsResolver $resolver) : void
@@ -241,7 +242,7 @@ class Block implements JsonSerializable
         );
         $resolver->setAllowedTypes(
             'previous',
-            ['null', Block::class]
+            ['null', self::class]
         );
 
         $resolver->setDefault(
