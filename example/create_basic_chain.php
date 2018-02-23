@@ -1,8 +1,9 @@
 <?php
-require(__DIR__.'/../vendor/autoload.php');
 
-use OhMyBrew\Blockchain\Blockchain;
+require __DIR__.'/../vendor/autoload.php';
+
 use OhMyBrew\Blockchain\Block;
+use OhMyBrew\Blockchain\Blockchain;
 
 // Get the number of runs
 if (!isset($argv[1])) {
@@ -11,10 +12,10 @@ if (!isset($argv[1])) {
 $runs = intval($argv[1]);
 
 // Color setup
-$RED="\033[0;31m";
-$BLUE="\033[0;34m";
-$YELLOW="\033[1;33m";
-$NC="\033[0m";
+$RED = "\033[0;31m";
+$BLUE = "\033[0;34m";
+$YELLOW = "\033[1;33m";
+$NC = "\033[0m";
 
 // Create chain
 $bc = new Blockchain();
@@ -24,7 +25,7 @@ echo "[{$RED}Blockchain created{$NC}]\n\n";
 for ($i = 0; $i < $runs; $i++) {
     // Build block
     $block = $bc->buildBlock(5, "Hello World {$i}");
-    echo $RED.">>> ".($i === 0 ? "GENESIS block" : "Block #{$i}") . " built{$NC}\n";
+    echo $RED.'>>> '.($i === 0 ? 'GENESIS block' : "Block #{$i}")." built{$NC}\n";
 
     // Mine it and create a hash
     echo "{$BLUE}Mining...{$NC}\n";
@@ -40,7 +41,7 @@ for ($i = 0; $i < $runs; $i++) {
 
 // Done, output results
 $bcHash = hash('sha256', json_encode($bc->getChain()));
-echo "Blockchain hash is ".$bcHash." with ".intval($argv[1])." valid blocks added to the chain.\n";
+echo 'Blockchain hash is '.$bcHash.' with '.intval($argv[1])." valid blocks added to the chain.\n";
 
 // Write chain to file
 file_put_contents(__DIR__."/{$bcHash}.json", json_encode($bc->getChain(), JSON_PRETTY_PRINT));

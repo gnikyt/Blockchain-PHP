@@ -24,7 +24,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
      * @test
      * @expectedException Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      * @expectedExcepionMessage The required option "difficulty" is missing.
-     * 
+     *
      * Should require difficulty set for mining.
      */
     public function shouldRequireDifficulty()
@@ -139,8 +139,8 @@ class BlockTest extends \PHPUnit\Framework\TestCase
     {
         $block = new Block([
             'difficulty' => 1,
-            'data' => 'Hello World',
-            'timestamp' => 1519403271 // So we can keep the mining result constant for this data/block
+            'data'       => 'Hello World',
+            'timestamp'  => 1519403271, // So we can keep the mining result constant for this data/block
         ]);
 
         $this->assertFalse($block->isMined());
