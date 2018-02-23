@@ -7,6 +7,8 @@
 
 A simple object-oriented blockchain implementation.
 
+![Screenshot](https://github.com/ohmybrew/Blockchain-PHP/raw/master/example/example.gif)
+
 ## Usage
 
 *Coming soon.*

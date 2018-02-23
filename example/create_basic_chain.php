@@ -24,7 +24,7 @@ echo "[{$RED}Blockchain created{$NC}]\n\n";
 // Make X blocks
 for ($i = 0; $i < $runs; $i++) {
     // Build block
-    $block = $bc->buildBlock(5, "Hello World {$i}");
+    $block = $bc->buildBlock(4, "Hello World {$i}");
     echo $RED.'>>> '.($i === 0 ? 'GENESIS block' : "Block #{$i}")." built{$NC}\n";
 
     // Mine it and create a hash
