@@ -1,4 +1,9 @@
 {
+  "name": "ohmybrew/blockchain-php",
+  "type": "library",
+  "description": "Blockchain example implemented in PHP",
+  "keywords": ["blockchain", "php"],
+  "license": "MIT",
   "minimum-stability": "dev",
   "authors": [
     {
