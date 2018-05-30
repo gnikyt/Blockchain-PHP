@@ -1,12 +1,16 @@
 <?php
 
-namespace OhMyBrew\Blockchain;
+namespace drupol\blockchain;
+
+use drupol\blockchain\Block\Block;
+use drupol\blockchain\Blockchain\Blockchain;
+use drupol\blockchain\Miner\Miner;
 
 class BlockTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $this->fixture = json_decode(file_get_contents(__DIR__.'/fixtures/d6f31977b058c45a300b0ebc824b91850f3bd7907f31e5696ad6c5601b158fb4.json'), true);
+        $this->fixture = json_decode(file_get_contents(__DIR__ . '/fixtures/ddee0846fbc411410be5bb7aa40a67bd006de87558a4318015ab36b892fd6de9.json'), true);
     }
 
     /**
@@ -42,14 +46,12 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $blockData = $this->fixture[1];
         $block = new Block($blockData);
 
-        $this->assertEquals($blockData['index'], $block->getIndex());
         $this->assertEquals($blockData['nonce'], $block->getNonce());
         $this->assertEquals($blockData['difficulty'], $block->getDifficulty());
         $this->assertEquals($blockData['data'], $block->getData());
-        $this->assertEquals($blockData['previous_hash'], $block->getPreviousHash());
         $this->assertEquals($blockData['hash'], $block->getHash());
         $this->assertEquals($blockData['timestamp'], $block->getTimestamp());
-        $this->assertEquals(null, $block->getPrevious()); // not loaded in a chain
+        $this->assertEquals('200e9d09e2e08ae372bce8d7270229d0e0335aee5ad4beaf0ca2fcd018b3a71acaa7745230a7deffbd1a8c3caa6cf6e37a7f718ff68ff6e6330cd15276eb9012', $block->getPreviousHash());
         $this->assertEquals(true, $block->isMined());
         $this->assertInstanceOf(Block::class, $block);
     }
@@ -61,12 +63,13 @@ class BlockTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldValidateWithPreviousBlock()
     {
-        $previous = new Block($this->fixture[0]);
-        $block = new Block($this->fixture[1], $previous);
+        $bc = new Blockchain();
 
-        $this->assertEquals($previous, $block->getPrevious());
-        $this->assertEquals($previous->getHash(), $block->getPreviousHash());
-        $this->assertTrue($block->validateNonce());
+        $genesis = new Block($this->fixture[0]);
+        $block = new Block($this->fixture[1], $genesis);
+
+        $this->assertEquals($genesis->getHash(), $block->getPreviousHash());
+        $this->assertTrue(Miner::validateNonce($block));
     }
 
     /**
@@ -79,9 +82,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $previous = new Block($this->fixture[0]);
         $block = new Block(['data' => 'Hello', 'difficulty' => 5], $previous);
 
-        $this->assertEquals($previous, $block->getPrevious());
         $this->assertEquals($previous->getHash(), $block->getPreviousHash());
-        $this->assertEquals($previous->getIndex() + 1, $block->getIndex());
     }
 
     /**
@@ -91,12 +92,13 @@ class BlockTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldInvalidateWithWrongPreviousBlock()
     {
+        $bc = new Blockchain();
+
         $previous = new Block($this->fixture[2]);
         $block = new Block($this->fixture[1], $previous);
 
-        $this->assertEquals($previous, $block->getPrevious());
-        $this->assertNotEquals($previous->getHash(), $block->getPreviousHash());
-        $this->assertFalse($block->validateNonce());
+        $this->assertEquals($previous->getHash(), $block->getPreviousHash());
+        $this->assertFalse(Miner::validateNonce($block));
     }
 
     /**
@@ -109,7 +111,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $fixture = $this->fixture[1];
         $block = new Block($fixture);
 
-        $this->assertEquals(json_encode($fixture), json_encode($block));
+        $this->assertEquals(json_encode($fixture), json_encode($block->getState()));
     }
 
     /**
@@ -140,14 +142,15 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $block = new Block([
             'difficulty' => 1,
             'data'       => 'Hello World',
-            'timestamp'  => 1519403271, // So we can keep the mining result constant for this data/block
+            'timestamp'  => 1519403271,
         ]);
 
         $this->assertFalse($block->isMined());
 
-        $block->mine();
+        $blockchain = new Blockchain();
+        $block = Miner::mine($block, $blockchain);
 
-        $this->assertEquals(3, $block->getNonce());
+        $this->assertEquals(22, $block->getNonce());
         $this->assertTrue($block->isMined());
     }
 }

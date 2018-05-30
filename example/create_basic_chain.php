@@ -1,9 +1,9 @@
 <?php
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-use OhMyBrew\Blockchain\Block;
-use OhMyBrew\Blockchain\Blockchain;
+use drupol\blockchain\Block;
+use drupol\blockchain\Blockchain;
 
 // Get the number of runs
 if (!isset($argv[1])) {
@@ -25,12 +25,13 @@ echo "[{$RED}Blockchain created{$NC}]\n\n";
 for ($i = 0; $i < $runs; $i++) {
     // Build block
     $block = $bc->buildBlock(4, "Hello World {$i}");
-    echo $RED.'>>> '.($i === 0 ? 'GENESIS block' : "Block #{$i}")." built{$NC}\n";
+    echo $RED . '>>> ' . (0 === $i ? 'GENESIS block' : "Block #{$i}") . " built{$NC}\n";
 
     // Mine it and create a hash
     echo "{$BLUE}Mining...{$NC}\n";
     $starttime = new DateTime();
-    $block->mine()->generateHash(true);
+    $block = \drupol\blockchain\Miner::mine($block);
+    $block->generateHash(true);
     $timediff = $starttime->diff(new DateTime());
     echo "{$BLUE}Mined in {$timediff->format('%s')} seconds\n\tHash: {$block->getHash()}\n\tNonce: {$block->getNonce()}\n\tData: {$block->getData()}{$NC}\n";
 
@@ -40,8 +41,8 @@ for ($i = 0; $i < $runs; $i++) {
 }
 
 // Done, output results
-$bcHash = hash('sha256', json_encode($bc->getChain()));
-echo 'Blockchain hash is '.$bcHash.' with '.intval($argv[1])." valid blocks added to the chain.\n";
+$bcHash = hash('sha256', $bc->getUuid());
+echo 'Blockchain hash is ' . $bcHash . ' with ' . intval($argv[1]) . " valid blocks added to the chain.\n";
 
 // Write chain to file
-file_put_contents(__DIR__."/{$bcHash}.json", json_encode($bc->getChain(), JSON_PRETTY_PRINT));
+file_put_contents(__DIR__ . "/{$bcHash}.json", json_encode($bc->getChainAsArray(), JSON_PRETTY_PRINT));

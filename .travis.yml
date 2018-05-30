@@ -1,5 +1,13 @@
 language: php
 
+git:
+  depth: 1
+
+cache:
+  directories:
+    - $HOME/.cache/composer
+    - $HOME/.composer/cache
+
 php:
   - 7.1
   - 7.2
@@ -8,7 +16,8 @@ before_script:
   - composer install
   - mkdir build
 
-script: bin/phpunit
+script:
+  - composer grumphp
 
 after_script:
   - php bin/coveralls -v

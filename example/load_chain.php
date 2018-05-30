@@ -1,9 +1,9 @@
 <?php
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-use OhMyBrew\Blockchain\Block;
-use OhMyBrew\Blockchain\Blockchain;
+use drupol\blockchain\Block;
+use drupol\blockchain\Blockchain;
 
 // Color setup
 $RED = "\033[0;31m";
@@ -25,19 +25,19 @@ foreach ($bcContents as $key => $blockData) {
     $chain[] = new Block(array_merge(
         $blockData,
         [
-            'previous' => isset($chain[$key - 1]) ? $chain[$key - 1] : null,
+            'previous' => isset($chain[$key - 1]) ? $chain[$key - 1]->getHash() : null,
         ]
     ));
 }
 
 // Load the chain
-$bc = new Blockchain(5, $chain);
-echo "{$BLUE}Inserted ".count($chain)." blocks{$NC}\n";
+$bc = new Blockchain(['chain' => $chain]);
+echo "{$BLUE}Inserted " . count($chain) . " blocks{$NC}\n";
 
 // Verify the chain
-if ($bc->isValidChain()) {
+if ($bc->isValid()) {
     echo "Chain is: {$BLUE}Valid{$NC}\n";
-    echo 'Blockchain hash is '.hash('sha256', json_encode($chain))." which matches the file input\n";
+    echo 'Blockchain hash is ' . hash('sha256', json_encode($chain)) . " which matches the file input\n";
 } else {
     echo "Chain is: {$RED}Invalid{$NC}\n";
 }
