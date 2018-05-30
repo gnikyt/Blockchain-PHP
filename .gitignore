@@ -3,3 +3,5 @@
 /bin
 /example/*.json
 /build
+.idea
+/.php_cs.cache

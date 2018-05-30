@@ -1,14 +1,17 @@
 <?php
 
-namespace OhMyBrew\Blockchain;
+namespace drupol\blockchain;
 
+use drupol\blockchain\Block\Block;
+use drupol\blockchain\Blockchain\Blockchain;
+use drupol\blockchain\Miner\Miner;
 use ReflectionClass;
 
 class BlockchainTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $this->fixture = json_decode(file_get_contents(__DIR__.'/fixtures/d6f31977b058c45a300b0ebc824b91850f3bd7907f31e5696ad6c5601b158fb4.json'), true);
+        $this->fixture = json_decode(file_get_contents(__DIR__ . '/fixtures/ddee0846fbc411410be5bb7aa40a67bd006de87558a4318015ab36b892fd6de9.json'), true);
     }
 
     /**
@@ -84,7 +87,10 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
         $chain = new Blockchain();
 
         $block = $chain->buildBlock(1, 'Hello World');
-        $block->mine();
+
+        $blockchain = new Blockchain();
+        $block = Miner::mine($block, $blockchain);
+
         $block->generateHash(true);
 
         $chain->addBlock($block, true);
@@ -102,13 +108,15 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
     public function shouldValidateChain()
     {
         $chain = new Blockchain();
-        $chain->addBlock(new Block($this->fixture[0]));
-        $chain->addBlock(
-            new Block(
-                $this->fixture[1],
-                new Block($this->fixture[0])
-            )
+
+        $genesis = new Block($this->fixture[0]);
+        $second = new Block(
+            $this->fixture[1],
+            $genesis
         );
+
+        $chain->addBlock($genesis);
+        $chain->addBlock($second);
 
         $this->assertTrue($chain->isValid());
     }
@@ -124,19 +132,21 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
     {
         // Add 3 blocks
         $chain = new Blockchain();
-        $chain->addBlock(new Block($this->fixture[0]));
-        $chain->addBlock(
-            new Block(
-                $this->fixture[1],
-                new Block($this->fixture[0])
-            )
+
+        $genesis = new Block($this->fixture[0]);
+        $chain->addBlock($genesis);
+
+        $first = new Block(
+            $this->fixture[1],
+            $genesis
         );
-        $chain->addBlock(
-            new Block(
-                $this->fixture[2],
-                new Block($this->fixture[1])
-            )
+        $chain->addBlock($first);
+
+        $second = new Block(
+            $this->fixture[2],
+            $first
         );
+        $chain->addBlock($second);
 
         // So we can mod the block state
         $class = new ReflectionClass(Block::class);
@@ -148,19 +158,17 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
         $property->setValue(
             $block3,
             array_merge(
-                $property->getValue($block3),
-                ['previous_hash' => '37783783783']
+                $block3->getState(),
+                ['previous' => '37783783783']
             )
         );
 
-        // Try to add the 4th block and validate the chain while adding
-        $chain->addBlock(
-            new Block(
-                $this->fixture[3],
-                new Block($this->fixture[2])
-            ),
-            true // Validate chain
+        $newblock = new Block(
+            $this->fixture[3],
+            new Block($this->fixture[2])
         );
+
+        $chain->addBlock($newblock, true);
     }
 
     /**
@@ -173,12 +181,12 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
         $chain = new Blockchain();
 
         $block = $chain->buildBlock(1, 'Hello World');
-        $block->mine();
+        $block = Miner::mine($block, $chain);
         $block->generateHash(true);
 
         $chain->addBlock($block, true);
 
-        $this->assertTrue($chain->isSameBlock($chain->getChain()[0], $block));
+        $this->assertEquals($chain->getChain()[0], $block);
     }
 
     /**
@@ -193,16 +201,16 @@ class BlockchainTest extends \PHPUnit\Framework\TestCase
             $chain[] = new Block(array_merge(
                 $blockData,
                 [
-                    'previous' => isset($chain[$key - 1]) ? $chain[$key - 1] : null,
+                    'previous' => isset($chain[$key - 1]) ? $chain[$key - 1]->getHash() : null,
                 ]
             ));
         }
 
-        $bc = new Blockchain($chain);
+        $bc = new Blockchain(['chain' => $chain]);
 
         $this->assertEquals(
-            'd6f31977b058c45a300b0ebc824b91850f3bd7907f31e5696ad6c5601b158fb4',
-            hash('sha256', json_encode($chain))
+            '02b74a2b78914869d3b6974d8b2bb6609b768ec918c72f67c3180d2088a8c034a0fdc544d9c817e7f6122373ee0aaa12e088d0fd9e2be0ed22c96daa3abc5943',
+            hash('sha512', json_encode($bc->getChainAsArray()))
         );
     }
 }
